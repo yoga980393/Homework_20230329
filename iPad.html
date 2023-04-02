@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <img src="https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipad-air-storage-select-202207-space-gray-wifi"
+                    alt="" id="img">
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="options">
+                    <select id="select1">
+                        <option value="" disabled selected>選取顏色</option>
+                    </select>
+                    <select id="select2">
+                        <option value="" disabled selected>選取容量</option>
+                    </select>
+                    <select id="select3">
+                        <option value="" disabled selected>選取網路</option>
+                    </select>
+                    <button id="btn">確定</button>
+                    <div class="price-display" id="price"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+
+    <script>
+        const url = "https://raw.githubusercontent.com/yoga980393/Apple/main/iPad_air.json";
+
+        let ipadArray = [];
+        let xhr = new XMLHttpRequest();
+
+        function loadData() {
+            xhr.onload = function () {
+                ipadArray = this.response;
+                selectType()
+            }
+
+            xhr.open("GET", url);
+            xhr.responseType = "json";
+            xhr.send();
+        }
+
+        window.onload = function () {
+            loadData()
+            btn = document.getElementById('btn')
+            btn.onclick = search
+        }
+
+        function selectType() {
+            let select1 = document.getElementById('select1')
+
+            let color = ipadArray.map(item => item.color)
+            let colorArray = [...new Set(color)]
+
+            colorArray.forEach(item => {
+                let option = document.createElement('option')
+                option.innerText = item
+                option.value = item
+                select1.appendChild(option)
+            })
+
+            select1.addEventListener('change', changeImage);
+
+            let select2 = document.getElementById('select2')
+
+            let storage = ipadArray.map(item => item.storage)
+            let storageArray = [...new Set(storage)]
+
+            storageArray.forEach(item => {
+                let option = document.createElement('option')
+                option.innerText = item
+                option.value = item
+                select2.appendChild(option)
+            })
+
+            let select3 = document.getElementById('select3')
+
+            let network = ipadArray.map(item => item.network)
+            let networkArray = [...new Set(network)]
+
+            networkArray.forEach(item => {
+                let option = document.createElement('option')
+                option.innerText = item
+                option.value = item
+                select3.appendChild(option)
+            })
+        }
+
+        function search() {
+            let select1Value = document.getElementById('select1').value;
+            let select2Value = document.getElementById('select2').value;
+            let select3Value = document.getElementById('select3').value;
+
+            if (!select1Value || !select2Value || !select3Value) {
+                alert("請選擇所有選項");
+                return;
+            }
+
+            let query = ipadArray
+            query = query.filter(item => item.color == document.getElementById('select1').value)
+            query = query.filter(item => item.storage == document.getElementById('select2').value)
+            query = query.filter(item => item.network == document.getElementById('select3').value)
+
+            document.getElementById('price').innerHTML = `售價 ${query[0].price} 元`
+            document.getElementById('img').src = query[0].picture
+        }
+
+        function changeImage() {
+            let selectedColor = document.getElementById('select1').value;
+            let colorData = ipadArray.find(item => item.color === selectedColor);
+            if (colorData) {
+                document.getElementById('img').src = colorData.picture;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
